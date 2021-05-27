@@ -38,3 +38,15 @@ RUN apk update && \
   curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer && \
   composer config -g process-timeout 3600 && \
   composer config -g repos.packagist composer https://packagist.org
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache \
+        freetype-dev \
+        libpng-dev \
+        jpeg-dev \
+        libjpeg-turbo-dev
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+
+RUN NUMPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) \
+    && docker-php-ext-install -j${NUMPROC} gd
